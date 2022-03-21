@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/arana-db/parser v0.1.1
 	github.com/cespare/xxhash/v2 v2.1.2
+	github.com/dolthub/go-mysql-server v0.11.0
 	github.com/dop251/goja v0.0.0-20220102113305-2298ace6d09d
 	github.com/dubbogo/gost v1.11.23-0.20220113102152-a2ef9b809a45
 	github.com/ghodss/yaml v1.0.0

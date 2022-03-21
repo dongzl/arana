@@ -39,7 +39,7 @@ const (
 	driverName string = "mysql"
 
 	// user:password@tcp(127.0.0.1:3306)/dbName?
-	dataSourceName string = "dksl:123456@tcp(127.0.0.1:13306)/employees?timeout=1s&readTimeout=1s&writeTimeout=1s&parseTime=true&loc=Local&charset=utf8mb4,utf8"
+	dataSourceName string = "root:123456@tcp(127.0.0.1:3307)/employees?timeout=1s&readTimeout=1s&writeTimeout=1s&parseTime=true&loc=Local&charset=utf8mb4,utf8"
 )
 
 func TestSimpleSharding(t *testing.T) {
@@ -144,4 +144,21 @@ func TestDelete(t *testing.T) {
 	affected, err := result.RowsAffected()
 	assert.NoErrorf(t, err, "delete row error: %v", err)
 	assert.Equal(t, int64(1), affected)
+}
+
+func TestSelectEmbed(t *testing.T)  {
+	db, err := sql.Open(driverName, dataSourceName)
+	assert.NoErrorf(t, err, "connection error: %v", err)
+	defer db.Close()
+	rows, err := db.Query(`SELECT * FROM student_0001 LIMIT 1`)
+	assert.NoErrorf(t, err, "select row error: %v", err)
+
+	var id string
+	if rows.Next() {
+		err = rows.Scan(&id)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+	assert.Equal(t, "id", id)
 }
