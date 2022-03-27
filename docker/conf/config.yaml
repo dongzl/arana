@@ -59,3 +59,7 @@ data:
           tbl_Pattern: student_${0000...0031}
         attributes:
           sqlMaxLimit: -1
+
+
+
+# mycli -h127.0.0.1 -P13306 -udksl employees -p123456

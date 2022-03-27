@@ -26,7 +26,7 @@ services:
     networks:
       - local
     ports:
-    - "13306:13306"
+    - "13307:13306"
     volumes:
     - ./conf/config.yaml:/app/config.yaml
     depends_on:
