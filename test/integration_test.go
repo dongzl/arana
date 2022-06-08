@@ -19,6 +19,7 @@ package test
 
 import (
 	"fmt"
+	"github.com/beevik/etree"
 	"testing"
 	"time"
 )
@@ -473,4 +474,81 @@ func (s *IntegrationSuite) TestAlterTable() {
 	assert.NoErrorf(t, err, "alter table error: %v", err)
 
 	assert.Equal(t, int64(0), affected)
+}
+
+func (s *IntegrationSuite) TestSQLCase() {
+	var (
+		db = s.DB()
+		t  = s.T()
+	)
+
+	type tt struct {
+		sql       string
+		args      []interface{}
+		expectLen int
+	}
+
+	var cases []tt
+
+	testDoc := etree.NewDocument()
+	if err := testDoc.ReadFromFile("/Users/dongzonglei/source_code/Github/arana/test/case/show_databases.xml"); err != nil {
+		panic(err)
+	}
+	testCases := testDoc.SelectElement("test-cases")
+	for _, tc := range testCases.SelectElements("test-case") {
+		sql := tc.SelectAttrValue("sql", "")
+		if len(sql) == 0 {
+			continue
+		}
+		t := tt{
+			sql:       sql,
+			args:      nil,
+			expectLen: 1,
+		}
+		cases = append(cases, t)
+	}
+
+	type result struct {
+		metadata []string
+		row      []string
+	}
+
+	resultDoc := etree.NewDocument()
+	if err := resultDoc.ReadFromFile("/Users/dongzonglei/source_code/Github/arana/test/result/show_databases.xml"); err != nil {
+		panic(err)
+	}
+	resultDataset := resultDoc.SelectElement("dataset")
+	metadata := resultDataset.SelectElement("metadata")
+	var names []string
+	for _, md := range metadata.SelectElements("column") {
+		name := md.SelectAttrValue("name", "")
+		if len(name) == 0 {
+			continue
+		}
+		names = append(names, name)
+	}
+	var rowDatas []string
+	for _, row := range resultDataset.SelectElements("row") {
+		values := row.SelectAttrValue("values", "")
+		if len(values) == 0 {
+			continue
+		}
+		rowDatas = append(rowDatas, values)
+	}
+
+	r := result{
+		metadata: names,
+		row:      rowDatas,
+	}
+
+	for _, it := range cases {
+		t.Run(it.sql, func(t *testing.T) {
+			rows, err := db.Query(it.sql, it.args...)
+			assert.NoError(t, err, "should query from sharding table successfully")
+			defer rows.Close()
+			data, _ := utils.PrintTable(rows)
+			//assert.Equal(t, it.expectLen, len(data))
+			assert.Equal(t, len(r.row), len(data))
+		})
+	}
 }
