@@ -94,3 +94,11 @@ involved in the Arana project.
 
 Arana software is licenced under the Apache License Version 2.0. See
 the [LICENSE](https://github.com/arana-db/arana/blob/master/LICENSE) file for details.
+
+## Contributors
+
+Thanks to all the following who contributed to `arana`:
+
+<a href="https://github.com/arana-db/arana/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=arana-db/arana" />
+</a>
